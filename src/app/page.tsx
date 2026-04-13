@@ -85,6 +85,38 @@ export default function Home() {
           </div>
         </div>
       </div>
+            
+
+            {/* New Team Member Card */}
+<div className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-orange-100 overflow-hidden">
+  <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  
+  <div className="text-center relative z-10">
+    
+    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v6m3-3h-6M12 20h9M12 4v4m0 0a4 4 0 110 8 4 4 0 010-8z" />
+      </svg>
+    </div>
+
+    <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+      New Team Member
+    </h2>
+
+    <p className="text-gray-600 mb-6 text-sm">
+      Add a new member to your team and assign roles
+    </p>
+
+    <Link
+      href="/register"
+      className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 px-6 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 hover:shadow-lg focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 inline-block text-center active:scale-95"
+    >
+      Add Member →
+    </Link>
+
+  </div>
+</div>
+      
 
       {/* Features Section */}
       <div className="mt-16 max-w-4xl w-full">
