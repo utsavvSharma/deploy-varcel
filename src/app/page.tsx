@@ -129,7 +129,7 @@ export default function Home() {
     </div>
 
     <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-      New Team Member
+      New Lead 
     </h2>
 
     <p className="text-gray-600 mb-6 text-sm">
