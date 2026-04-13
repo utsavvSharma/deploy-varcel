@@ -1,0 +1,81 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+import { NextRequest } from 'next/server';
+
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+export function rateLimit(request: NextRequest, maxRequests = 10, windowMs = 60000) {
+  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const now = Date.now();
+  
+  const current = rateLimitMap.get(ip);
+  
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return { success: true };
+  }
+  
+  if (current.count >= maxRequests) {
+    return { 
+      success: false, 
+      error: 'Too many requests',
+      resetTime: current.resetTime 
+    };
+  }
+  
+  current.count++;
+  return { success: true };
+}
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+/src/generated/prisma
+
+# Sensitive data files
+data/users.json
+data/leads.json
+
+# Database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+logs/

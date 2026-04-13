@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String?  @unique
+  email        String?  @unique
+  password     String
+  name         String
+  role         Role     @default(SALES)
+  teamLeaderId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  assignedLeads Lead[] @relation("AssignedLeads")
+  createdLeads  Lead[] @relation("CreatedLeads")
+  notes         Note[]
+  sessions      UserSession[]
+  activityLogs  ActivityLog[]
+  teamLeader    User?  @relation("TeamMembers", fields: [teamLeaderId], references: [id])
+  teamMembers   User[] @relation("TeamMembers")
+  
+  @@map("users")
+}
+
+model Lead {
+  id           String     @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  company      String?
+  country      String?
+  status       LeadStatus @default(NEW)
+  priority     Priority   @default(MEDIUM)
+  public       Boolean    @default(false)
+  followUpDate DateTime?
+  assignedTo   String?
+  createdBy    String?
+  adminComment String?
+  saleAmount   Decimal?   @db.Decimal(10, 2)
+  convertedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  // Relations
+  assignedUser User? @relation(fields: [assignedTo], references: [id], name: "AssignedLeads")
+  createdByUser User? @relation(fields: [createdBy], references: [id], name: "CreatedLeads")
+  notes        Note[]
+  
+  @@map("leads")
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  text      String
+  leadId    String
+  userId    String
+  createdAt DateTime @default(now())
+  
+  // Relations
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+  
+  @@map("notes")
+}
+
+model UserSession {
+  id            String   @id @default(cuid())
+  userId        String
+  loginAt       DateTime @default(now())
+  logoutAt      DateTime?
+  durationSec   Int?
+  ip            String?
+  userAgent     String?
+  lastActiveAt  DateTime? @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, loginAt])
+  @@map("user_sessions")
+}
+
+enum Role {
+  ADMIN
+  TEAM_LEADER
+  SALES
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  CONVERTED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model MonthlySalesRanking {
+  id          String   @id @default(cuid())
+  userId      String
+  userName    String
+  month       Int      // 1-12
+  year        Int
+  totalAmount Decimal  @db.Decimal(10, 2)
+  totalSales  Int
+  rank        Int
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, month, year])
+  @@index([month, year])
+  @@map("monthly_sales_rankings")
+}
+
+model ActivityLog {
+  id          String       @id @default(cuid())
+  userId      String
+  action      ActivityType
+  description String
+  metadata    Json?        // Store additional data like leadId, leadName, etc.
+  createdAt   DateTime     @default(now())
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@map("activity_logs")
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  LEAD_CREATED
+  LEAD_UPDATED
+  LEAD_DELETED
+  LEAD_ASSIGNED
+  LEAD_CLAIMED
+  NOTE_ADDED
+  STATUS_CHANGED
+  FOLLOWUP_SET
+  ROLE_CHANGED
+  TEAM_MEMBER_ASSIGNED
+  TEAM_MEMBER_REMOVED
+}
